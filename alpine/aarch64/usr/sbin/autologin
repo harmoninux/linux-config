@@ -1,3 +1,5 @@
 #!/bin/sh
-echo -e "\nUptime $(cut -d' ' -f1 /proc/uptime)s\n"
+/usr/sbin/autocols
+clear
+echo -e "Uptime $(cut -d' ' -f1 /proc/uptime)s\n"
 exec login -f root

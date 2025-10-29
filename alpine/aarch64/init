@@ -6,11 +6,13 @@ mkdir /dev/pts
 mount -t devpts devpts /dev/pts
 mount -t tmpfs tmpfs /tmp
 
-echo "Configuring networking..."
 ifconfig eth0 10.0.2.15 netmask 255.255.255.0
 route add default gw 10.0.2.2
 ifconfig lo 127.0.0.1 netmask 255.0.0.0
 
-echo -e "Boot took $(cut -d' ' -f1 /proc/uptime) seconds."
+mount -t 9p -o trans=virtio,version=9p2000.L hostshare /mnt/share
+
+clear
+#echo -e "\nBoot took $(cut -d' ' -f1 /proc/uptime) seconds."
 
 exec /sbin/init
