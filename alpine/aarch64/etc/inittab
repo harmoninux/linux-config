@@ -13,7 +13,7 @@
 #tty6::respawn:/sbin/getty 38400 tty6
 
 # Put a getty on the serial port
-ttyAMA0::respawn:/sbin/getty -L 0 ttyAMA0 vt100 -n -l /usr/sbin/autologin
+ttyAMA0::respawn:/sbin/getty -L 0 ttyAMA0 ansi -n -l /usr/sbin/autologin
 
 # Stuff to do for the 3-finger salute
 ::ctrlaltdel:/sbin/reboot
