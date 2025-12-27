@@ -1,5 +1,5 @@
 #!/bin/sh
-autocols
+resize > /dev/null
 clear
 echo -e "Uptime $(cut -d' ' -f1 /proc/uptime)s\n"
 exec login -f root

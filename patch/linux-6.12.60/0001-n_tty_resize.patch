@@ -1,5 +1,5 @@
 diff --git a/drivers/tty/n_tty.c b/drivers/tty/n_tty.c
-index 94fa98108..94beb843f 100644
+index 94fa98108..4572e3380 100644
 --- a/drivers/tty/n_tty.c
 +++ b/drivers/tty/n_tty.c
 @@ -44,6 +44,8 @@
@@ -11,11 +11,11 @@ index 94fa98108..94beb843f 100644
  #include <linux/types.h>
  #include <linux/uaccess.h>
  #include <linux/vmalloc.h>
-@@ -1608,6 +1610,102 @@ static void n_tty_receive_buf_standard(struct tty_struct *tty, const u8 *cp,
+@@ -1608,6 +1610,93 @@ static void n_tty_receive_buf_standard(struct tty_struct *tty, const u8 *cp,
  	}
  }
  
-+static void do_set_pty_winsize(struct tty_struct *tty, unsigned rows, unsigned cols) {
++static void __do_set_pty_winsize(struct tty_struct *tty, unsigned rows, unsigned cols) {
 +
 +    struct winsize ws;
 +    struct siginfo info;
@@ -90,16 +90,7 @@ index 94fa98108..94beb843f 100644
 +					unsigned int cols = params[2];
 +					/* rudimentary sanity checks */
 +					if (rows >= 1 && rows <= 4096 && cols >= 1 && cols <= 4096) {
-+						/* Only allow on console ttys */
-+						if (tty && tty->driver && tty->driver->type &&
-+							tty->driver->type == TTY_DRIVER_TYPE_SERIAL) {
-+							/*
-+							* call into vt/console resize helper
-+							* The real function may be vc_resize() or con_set_size()
-+							* depending on kernel version; adapt accordingly.
-+							*/
-+							do_set_pty_winsize(tty, rows, cols);
-+						}
++						__do_set_pty_winsize(tty, rows, cols);
 +					}
 +				}
 +				state = S_NORMAL;
@@ -114,11 +105,13 @@ index 94fa98108..94beb843f 100644
  static void __receive_buf(struct tty_struct *tty, const u8 *cp, const u8 *fp,
  			  size_t count)
  {
-@@ -1615,6 +1713,8 @@ static void __receive_buf(struct tty_struct *tty, const u8 *cp, const u8 *fp,
+@@ -1615,6 +1704,10 @@ static void __receive_buf(struct tty_struct *tty, const u8 *cp, const u8 *fp,
  	bool preops = I_ISTRIP(tty) || (I_IUCLC(tty) && L_IEXTEN(tty));
  	size_t la_count = min(ldata->lookahead_count, count);
  
-+	__process_set_size(tty, cp, count);
++	if(tty->driver->type == TTY_DRIVER_TYPE_SERIAL) {
++		__process_set_size(tty, cp, count);
++	}
 +
  	if (ldata->real_raw)
  		n_tty_receive_buf_real_raw(tty, cp, count);
