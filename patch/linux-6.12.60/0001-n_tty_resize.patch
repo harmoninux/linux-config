@@ -1,5 +1,5 @@
 diff --git a/drivers/tty/n_tty.c b/drivers/tty/n_tty.c
-index 94fa98108..1f70ee58d 100644
+index 94fa98108..8f513338f 100644
 --- a/drivers/tty/n_tty.c
 +++ b/drivers/tty/n_tty.c
 @@ -44,6 +44,8 @@
@@ -11,7 +11,7 @@ index 94fa98108..1f70ee58d 100644
  #include <linux/types.h>
  #include <linux/uaccess.h>
  #include <linux/vmalloc.h>
-@@ -1608,7 +1610,114 @@ static void n_tty_receive_buf_standard(struct tty_struct *tty, const u8 *cp,
+@@ -1608,7 +1610,101 @@ static void n_tty_receive_buf_standard(struct tty_struct *tty, const u8 *cp,
  	}
  }
  
@@ -19,8 +19,6 @@ index 94fa98108..1f70ee58d 100644
 +static void __do_set_pty_winsize(struct tty_struct *tty, unsigned rows, unsigned cols) {
 +
 +    struct winsize ws;
-+    struct siginfo info;
-+    struct pid* pgrp;
 +
 +    /* prepare winsize */
 +    memset(&ws, 0, sizeof(ws));
@@ -28,18 +26,7 @@ index 94fa98108..1f70ee58d 100644
 +    ws.ws_col = cols;
 +
 +    /* set tty winsize */
-+    tty_do_resize(tty, &ws);  /* or tty_port_set_winsize(tty->port, rows, cols) */
-+
-+    /* notify foreground process group with SIGWINCH */
-+    memset(&info, 0, sizeof(info));
-+    info.si_signo = SIGWINCH;
-+    info.si_code  = SI_KERNEL;
-+
-+	pgrp = tty_get_pgrp(tty);
-+    if (pgrp) {
-+		kill_pgrp(pgrp, SIGWINCH, 1);
-+        put_pid(pgrp);
-+    }
++    tty_do_resize(tty, &ws);
 +}
 +
 +/**
@@ -127,7 +114,7 @@ index 94fa98108..1f70ee58d 100644
  			  size_t count)
  {
  	struct n_tty_data *ldata = tty->disc_data;
-@@ -1659,6 +1768,27 @@ static void __receive_buf(struct tty_struct *tty, const u8 *cp, const u8 *fp,
+@@ -1659,6 +1755,27 @@ static void __receive_buf(struct tty_struct *tty, const u8 *cp, const u8 *fp,
  	}
  }
  
