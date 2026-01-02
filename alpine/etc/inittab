@@ -5,6 +5,7 @@
 ::wait:/sbin/openrc default
 
 # Set up a couple of getty's
+tty1::respawn:/sbin/getty -n -l /usr/sbin/autologin 38400 tty1 linux
 #tty1::respawn:/sbin/getty 38400 tty1
 #tty2::respawn:/sbin/getty 38400 tty2
 #tty3::respawn:/sbin/getty 38400 tty3
