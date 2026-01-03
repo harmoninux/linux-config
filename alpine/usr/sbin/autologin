@@ -1,5 +1,5 @@
 #!/bin/sh
-printf '\e[3J\e[H\e[2J'
+clear
 resize > /dev/null
 echo -e "Uptime $(cut -d' ' -f1 /proc/uptime)s\n"
 exec login -f root
